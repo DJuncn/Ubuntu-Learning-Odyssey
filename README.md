@@ -1,5 +1,9 @@
 # 学习 Ubuntu 的那些事儿
 
+项目地址：[https://github.com/DJuncn/Ubuntu-Learning-Odyssey](https://github.com/DJuncn/Ubuntu-Learning-Odyssey)
+
+文章地址：[https://djuncn.github.io/Ubuntu-Learning-Odyssey/#/](https://djuncn.github.io/Ubuntu-Learning-Odyssey/#/)
+
 
 
 ## 【2025-8-26】初入 Ubuntu
@@ -74,13 +78,17 @@ set backspace=2		# 添加此行
 
 **补充：**
 
-【2025-8-29】
+【2025-8-29.1】
 
 前两天由于跟着视频学习的缘故我一直在使用 Ubuntu 的桌面版（ubuntu-22.04.5-desktop-amd64.iso），虽然有桌面使用起来蛮方便的，但我还是习惯使用纯命令行，尽管通过 ssh 远程连接之后会变成纯命令行，但我还是选择安装一台纯命令行的系统。
 
 这我也是有过考量的，首先，在下载 Ubuntu 镜像的时候发现————它有两种版本：ubuntu-22.04.5-desktop-amd64.iso、ubuntu-22.04.5-live-server-amd64.iso；其次，相比于桌面版，服务器版没有安装那么多的软件要更加轻量精简；最后，我想了一下，在生产环境中大多数都是用的服务器的版本，它们两个版本构建的环境肯定会有差别的，所以我觉得使用更接近生产环境的版本更好。
 
-既然已经决定好，我也就着手开始搭建了。搭建完之后，我在修改 `/etc/ssh/sshd_config` 文件时突然发现，此时的 vi 编辑器并没有出现上面的情况，且 vim 是已经安装好的。这也更加证实了我的猜想。
+既然已经决定好，我也就着手开始安装了。安装完成之后，我在修改 `/etc/ssh/sshd_config` 文件时突然发现，此时的 vi 编辑器并没有出现上面的情况，且 vim 是已经安装好的。这也更加证实了我的猜想。
+
+【2025-8-29.2】
+
+后面我又重新安装了服务器版，发现在安装过程中有一处选项：1.Ubuntu Server，2.Ubuntu Server (minimized)。在默认选项中使用的是 1。这时我才发觉，原来我选的并不是最小化安装。这次我选择了最小化安装，安装完成后我依旧是准备去修改 `/etc/ssh/sshd_config`，结果连 vi 这个命令都没有，这就很尴尬了 [\自嘲+挠头]。
 
 
 
@@ -164,9 +172,11 @@ root@test-virtual-machine:~# netplan apply
 
 【2025-8-29】
 
-在【2025-8-27】vi 编辑器的退格问题那一栏中，我在末尾补充了我改用 Ubuntu 服务器版（ubuntu-22.04.5-live-server-amd64.iso）的原因。在注意到 vi 编辑器的不同之后，我迅速就联想到了网卡配置文件，果不其然，网卡配置文件的初始内容也有所不同。也有可能是我在安装过程中手动配置静态网卡的缘故？
+在【2025-8-27】vi 编辑器的退格问题那一栏中，我在末尾补充了我改用 Ubuntu 服务器版（ubuntu-22.04.5-live-server-amd64.iso）的原因。在注意到 vi 编辑器的不同之后，我迅速就联想到了网卡配置文件，果不其然，网卡配置文件的初始内容也有所不同。也有可能是我在安装过程中手动配置静态网卡的缘故？仔细一想，好像确实有这个可能。我又重装了一遍，在配置网卡的地方我没去修改它，而是使用默认。安装完成后，我再次 `cat` 查看配置文件内容。
 
-服务器的初始内容：
+经验证，在安装过程中经过手动配置网卡后，配置文件里面的内容确实会多出更多的内容。那么这个时候在安装过程中手动配置网卡的好处就凸现出来了，当你下一次修改网卡便不用再去输入 "名词" 了，直接在里面修改 IP 地址就可以了。
+
+服务器版的初始内容（手动）：
 
 ```
 root@ubuntuserver:~# cat /etc/netplan/50-cloud-init.yaml 
@@ -189,4 +199,49 @@ network:
                 via: 192.168.147.2
     version: 2
 ```
+
+服务器版的初始内容（自动）：
+
+```
+root@ubuntuserver:~# cat /etc/netplan/50-cloud-init.yaml 
+# This file is generated from information provided by the datasource.  Changes
+# to it will not persist across an instance reboot.  To disable cloud-init's
+# network configuration capabilities, write a file
+# /etc/cloud/cloud.cfg.d/99-disable-network-config.cfg with the following:
+# network: {config: disabled}
+network:
+    ethernets:
+        ens33:
+            dhcp4: true
+    version: 2
+```
+
+
+
+## 【2025-8-30】安装Docker和Docker Compose
+
+**官方地址**
+
+- 安装Docker：[https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
+
+
+- 安装Docker Compose：[https://docs.docker.com/compose/install/standalone/](https://docs.docker.com/compose/install/standalone/)
+
+今天，花了一下午研究了一下Ubuntu是如何安装Docker和Docker Compose。
+
+总的来说还是受益匪浅的。
+
+通过阅读官方文档以及向AI提问，我将流程梳理总结了一下，目前发布在了csdn上面。
+
+博客地址：[Ubuntu安装Docker和Docker Compose-CSDN博客](https://blog.csdn.net/Jun__Deng/article/details/151019067?spm=1001.2014.3001.5501)
+
+
+
+## 【2025-8-30】Ubuntu服务器版安装步骤
+
+使用镜像：ubuntu-22.04.5-live-server-amd64.iso
+
+在研究完Docker后，我想着再熟悉一下Ubuntu服务器版安装步骤，于是便顺手将步骤给截图保存了下来。既然保存了下来也不能浪费，刚好csdn有个每日任务————发布两篇博客有一张1500曝光的流量券。整理了一下也顺手给发布了。
+
+博客地址：[Ubuntu服务器版安装步骤-CSDN博客](https://blog.csdn.net/Jun__Deng/article/details/151019537?spm=1001.2014.3001.5501)
 
