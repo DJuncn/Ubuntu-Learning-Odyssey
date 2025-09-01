@@ -218,36 +218,36 @@ network:
 
 
 
-## 【2025-8-30】安装Docker和Docker Compose
+## 【2025-8-30】安装 Docker 和 Docker Compose
 
 **官方地址**
 
-- 安装Docker：[https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
+- 安装 Docker：[https://docs.docker.com/engine/install/ubuntu/](https://docs.docker.com/engine/install/ubuntu/)
 
 
-- 安装Docker Compose：[https://docs.docker.com/compose/install/standalone/](https://docs.docker.com/compose/install/standalone/)
+- 安装 Docker Compose：[https://docs.docker.com/compose/install/standalone/](https://docs.docker.com/compose/install/standalone/)
 
-今天，花了一下午研究了一下Ubuntu是如何安装Docker和Docker Compose。
+今天，花了一下午研究了一下 Ubuntu 是如何安装 Docker 和 Docker Compose。
 
 总的来说还是受益匪浅的。
 
-通过阅读官方文档以及向AI提问，我将流程梳理总结了一下，目前发布在了csdn上面。
+通过阅读官方文档以及向 AI 提问，我将流程梳理总结了一下，目前发布在了 csdn 上面。
 
-博客地址：[Ubuntu安装Docker和Docker Compose-CSDN博客](https://blog.csdn.net/Jun__Deng/article/details/151019067?spm=1001.2014.3001.5501)
+博客地址：[Ubuntu 安装 Docker 和 Docker Compose-CSDN 博客](https://blog.csdn.net/Jun__Deng/article/details/151019067?spm=1001.2014.3001.5501)
 
 
 
-## 【2025-8-30】Ubuntu服务器版安装步骤
+## 【2025-8-30】Ubuntu 服务器版安装步骤
 
 使用镜像：ubuntu-22.04.5-live-server-amd64.iso
 
-在研究完Docker后，我想着再熟悉一下Ubuntu服务器版安装步骤，于是便顺手将步骤给截图保存了下来。既然保存了下来也不能浪费，刚好csdn有个每日任务————发布两篇博客有一张1500曝光的流量券。整理了一下也顺手给发布了。
+在研究完 Docker 后，我想着再熟悉一下 Ubuntu 服务器版安装步骤，于是便顺手将步骤给截图保存了下来。既然保存了下来也不能浪费，刚好 csdn 有个每日任务————发布两篇博客有一张 1500 曝光的流量券。整理了一下也顺手给发布了。
 
-博客地址：[Ubuntu服务器版安装步骤-CSDN博客](https://blog.csdn.net/Jun__Deng/article/details/151019537?spm=1001.2014.3001.5501)
+博客地址：[Ubuntu 服务器版安装步骤-CSDN 博客](https://blog.csdn.net/Jun__Deng/article/details/151019537?spm=1001.2014.3001.5501)
 
 
 
-## 【2025-8-31】搭建Cloudreve私人网盘
+## 【2025-8-31】搭建 Cloudreve 私人网盘
 
 > **Cloudreve 是什么？**
 >
@@ -259,4 +259,14 @@ network:
 > - 对于 Cloudreve 存储的文件，我同时也会使用其他文件管理器一起管理；
 > - 我想把其他网盘存储服务“再分发”给我的用户使用；
 
-今天抽空看了一下Cloudreve的文档，研究了好一会，终于搭建出来了。又花了一点时间总结成了文档，目前还没公开出来。如果大家感兴趣的话，等我发布了会补上链接的。
+
+
+今天抽空看了一下 Cloudreve 的文档。
+
+官网给的 docker-compose.yml 文件是以 `PostgreSQL`，我稍微改了一下，改成了 `MySQL`。既然数据库改了，那变量配置自然也是要改的。改为之后问题就出现，cloudreve-backend 一直处于重启状态，很明显，这个容器没有起来。没有起来那就去看日志，提示数据连接失败，大概率是密码出现了问题，主要问题还是出现在变量上面，毕竟我就改了变量。锁定了方向那就好办了，直接去检查 MySQL 变量，仔仔细细看了两三遍发现变量没错，这就有点意思了，我又转过去研究官网文档。这一看，还真看到了问题所在————PostgreSQL 有个允许用户无需密码即可连接数据库的变量 `POSTGRES_HOST_AUTH_METHOD=trust`，所以在 cloudreve-backend 中并没有添加数据库的密码变量。当我换成 MySQL 后，就需要在 cloudreve-backend 中多添加一行密码变量。
+
+在 cloudreve-backend 中加上变量后也，容器也是成功 up 运行起来了。
+
+后面又在 docker-compose.yml 里面增加 Nginx 的配置，给 Cloudreve 配置上了反向代理。
+
+花了一点时间总结成了文档，目前还没有发布到博客上。后面等我发布了会补上链接的。
